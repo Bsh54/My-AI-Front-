@@ -1,4 +1,4 @@
-# 🧠 Analyse Approfondie des Systèmes - All Model Chat
+# 🧠 Analyse Approfondie des Systèmes - My AI Front
 
 Ce document détaille le fonctionnement "sous le capot" des systèmes les plus complexes de votre application.
 

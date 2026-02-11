@@ -1,4 +1,4 @@
-# 🎨 Carte des Composants UI - All Model Chat
+# 🎨 Carte des Composants UI - My AI Front
 
 Ce guide vous permet de localiser instantanément le fichier responsable d'un élément visuel précis que vous voyez à l'écran.
 
@@ -61,9 +61,9 @@ Ce guide vous permet de localiser instantanément le fichier responsable d'un é
 ## 🎨 Styles Globaux et Thèmes
 Si vous voulez changer l'esthétique générale sans toucher au code React :
 
-1.  **Fichier `all-model-chat/styles/main.css`** :
+1.  **Fichier `my-ai-front/styles/main.css`** :
     *   C'est ici que sont définies les polices, les arrondis des boutons (`border-radius`), et les ombres.
-2.  **Fichier `all-model-chat/constants/themeConstants.ts`** :
+2.  **Fichier `my-ai-front/constants/themeConstants.ts`** :
     *   Cherchez l'objet `themes`. Vous pouvez créer votre propre thème en copiant un objet existant (ex: `pearl` ou `dark`).
     *   **Couleur principale (Accent) :** Changez `bgAccent`.
     *   **Couleur du texte :** Changez `textPrimary`.
@@ -73,16 +73,16 @@ Si vous voulez changer l'esthétique générale sans toucher au code React :
 ## 🔧 Exemples de modifications fréquentes
 
 ### Je veux changer l'arrondi de toutes les bulles de message
-*   Allez dans `all-model-chat/styles/main.css`.
+*   Allez dans `my-ai-front/styles/main.css`.
 *   Cherchez `--theme-border-radius`.
 
 ### Je veux supprimer l'effet de clignotement du texte pendant qu'il s'écrit
-*   Allez dans `all-model-chat/styles/animations.css`.
+*   Allez dans `my-ai-front/styles/animations.css`.
 *   Cherchez `.animate-cursor-blink`.
 
 ### Je veux traduire une étiquette ou un bouton
-*   Allez dans `all-model-chat/utils/translations/`.
+*   Allez dans `my-ai-front/utils/translations/`.
 *   Choisissez le fichier correspondant au domaine (ex: `chatInput.ts` pour la barre du bas).
 
 ---
-*Ce document est votre guide visuel pour All Model Chat.*
+*Ce document est votre guide visuel pour My AI Front.*

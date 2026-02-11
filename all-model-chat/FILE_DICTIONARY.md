@@ -1,10 +1,10 @@
-# 📖 Dictionnaire des Fichiers - All Model Chat
+# 📖 Dictionnaire des Fichiers - My AI Front
 
 Ce document liste chaque fichier important du projet et explique son rôle précis pour vous aider dans vos modifications.
 
 ---
 
-## 📂 Racine du projet (`all-model-chat/`)
+## 📂 Racine du projet (`my-ai-front/`)
 | Fichier | Rôle |
 | :--- | :--- |
 | `App.tsx` | Point d'entrée React. Assemble le Layout global et les fournisseurs de contexte. |

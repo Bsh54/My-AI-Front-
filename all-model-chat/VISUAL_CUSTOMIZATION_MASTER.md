@@ -1,4 +1,4 @@
-# 🎨 Master Guide : Personnalisation Visuelle de All Model Chat
+# 🎨 Master Guide : Personnalisation Visuelle de My AI Front
 
 Ce document est conçu pour vous permettre de modifier l'interface (UI) de l'application sans avoir à chercher pendant des heures dans le code. Chaque élément visuel est répertorié ici avec son fichier source et des exemples de modifications.
 
@@ -8,7 +8,7 @@ Ce document est conçu pour vous permettre de modifier l'interface (UI) de l'app
 
 Tout le style repose sur des variables CSS injectées dynamiquement.
 
-### **Les Styles Globaux (`all-model-chat/styles/main.css`)**
+### **Les Styles Globaux (`my-ai-front/styles/main.css`)**
 C'est le fichier le plus important pour l'esthétique globale.
 - **Ce que vous pouvez y faire :**
     - Changer les polices (`font-family`).
@@ -16,7 +16,7 @@ C'est le fichier le plus important pour l'esthétique globale.
     - Ajuster les ombres portées (`box-shadow`).
     - Modifier la barre de défilement (chercher `::-webkit-scrollbar`).
 
-### **Les Thèmes (`all-model-chat/constants/themeConstants.ts`)**
+### **Les Thèmes (`my-ai-front/constants/themeConstants.ts`)**
 L'application propose plusieurs thèmes (Pearl, Onyx, etc.).
 - **Structure d'un thème :**
     ```typescript
@@ -79,7 +79,7 @@ C'est l'élément le plus complexe visuellement.
 
 ---
 
-## 🪄 6. Animations (`all-model-chat/styles/animations.css`)
+## 🪄 6. Animations (`my-ai-front/styles/animations.css`)
 
 L'application utilise beaucoup d'animations pour paraître fluide.
 - **`animate-pulse`** : Utilisé pour les messages en cours de chargement.

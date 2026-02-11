@@ -1,4 +1,4 @@
-# 🗺️ Guide de Structure - All Model Chat (Version ShadsAI)
+# 🗺️ Guide de Structure - My AI Front (Version ShadsAI)
 
 Ce document explique le rôle de chaque dossier et fichier important pour vous permettre de modifier rapidement l'interface visuelle ou le comportement de l'application.
 
@@ -58,15 +58,15 @@ C'est ici qu'on change les valeurs "en dur".
 ## 🛠️ Ce que vous pouvez faire (Guide Rapide)
 
 ### Modifier les couleurs ou le style
-1.  Allez dans `all-model-chat/styles/main.css` pour les variables globales.
-2.  Regardez `all-model-chat/constants/themeConstants.ts` pour modifier les thèmes prédéfinis.
+1.  Allez dans `my-ai-front/styles/main.css` pour les variables globales.
+2.  Regardez `my-ai-front/constants/themeConstants.ts` pour modifier les thèmes prédéfinis.
 3.  L'application utilise **Tailwind CSS**, vous pouvez donc ajouter des classes directement dans les fichiers `.tsx`.
 
 ### Changer le message d'accueil
-*   Modifiez `all-model-chat/utils/translations/app.ts` (recherchez la clé `welcome_greeting`).
+*   Modifiez `my-ai-front/utils/translations/app.ts` (recherchez la clé `welcome_greeting`).
 
 ### Modifier le format des messages envoyés à l'IA
-*   Tout se passe dans `all-model-chat/services/api/chatApi.ts`, dans la fonction `convertToOpenAIHistory`.
+*   Tout se passe dans `my-ai-front/services/api/chatApi.ts`, dans la fonction `convertToOpenAIHistory`.
 
 ### Ajouter un nouveau composant visuel dans le chat
 *   Créez votre composant dans `components/message/blocks/`.

@@ -19,7 +19,7 @@
 
 ## 📖 Présentation
 
-**My AI Front** est une version personnalisée et optimisée de All Model Chat, spécifiquement verrouillée pour fonctionner avec un modèle unique : **Gemini 2.5 Flash**.
+**My AI Front** est une version personnalisée et optimisée de My AI Front, spécifiquement verrouillée pour fonctionner avec un modèle unique : **Gemini 2.5 Flash**.
 
 Cette version a été restructurée pour communiquer directement avec un point d'accès **Cloudflare Worker** au format OpenAI, offrant une interface légère, rapide et sans configuration manuelle nécessaire pour l'utilisateur final.
 
@@ -42,7 +42,7 @@ Cette version a été restructurée pour communiquer directement avec un point d
 ```bash
 # Cloner le dépôt
 git clone https://github.com/Bsh54/My-AI-Front-.git
-cd My-AI-Front-/all-model-chat
+cd My-AI-Front-/my-ai-front
 
 # Installer les dépendances
 npm install
@@ -59,12 +59,12 @@ Accédez ensuite à `http://localhost:5173` dans votre navigateur.
 
 ## 📁 Documentation Interne
 
-Pour vous aider à personnaliser l'interface, plusieurs guides détaillés sont disponibles à la racine du dossier `all-model-chat` :
+Pour vous aider à personnaliser l'interface, plusieurs guides détaillés sont disponibles à la racine du dossier `my-ai-front` :
 
-*   [PROJECT_GUIDE.md](./all-model-chat/PROJECT_GUIDE.md) : Vue d'ensemble pour débuter.
-*   [VISUAL_CUSTOMIZATION_MASTER.md](./all-model-chat/VISUAL_CUSTOMIZATION_MASTER.md) : Guide ultime pour changer les couleurs et le style.
-*   [UI_COMPONENT_MAP.md](./all-model-chat/UI_COMPONENT_MAP.md) : Carte visuelle pour trouver quel fichier modifie quel bouton.
-*   [TECHNICAL_ARCHITECTURE.md](./all-model-chat/TECHNICAL_ARCHITECTURE.md) : Analyse du flux de données.
+*   [PROJECT_GUIDE.md](./my-ai-front/PROJECT_GUIDE.md) : Vue d'ensemble pour débuter.
+*   [VISUAL_CUSTOMIZATION_MASTER.md](./my-ai-front/VISUAL_CUSTOMIZATION_MASTER.md) : Guide ultime pour changer les couleurs et le style.
+*   [UI_COMPONENT_MAP.md](./my-ai-front/UI_COMPONENT_MAP.md) : Carte visuelle pour trouver quel fichier modifie quel bouton.
+*   [TECHNICAL_ARCHITECTURE.md](./my-ai-front/TECHNICAL_ARCHITECTURE.md) : Analyse du flux de données.
 
 ---
 

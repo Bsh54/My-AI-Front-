@@ -1,4 +1,4 @@
-# 🏗️ Architecture Technique - All Model Chat (ShadsAI)
+# 🏗️ Architecture Technique - My AI Front (ShadsAI)
 
 Ce document offre une analyse profonde de la structure du code pour faciliter les modifications complexes et la compréhension du flux de données.
 
@@ -21,7 +21,7 @@ Voici comment une action utilisateur (taper un message) se transforme en répons
 
 ## 📁 Analyse Détaillée par Dossier
 
-### 📂 `all-model-chat/services/`
+### 📂 `my-ai-front/services/`
 C'est la couche d'abstraction réseau.
 *   **`api/chatApi.ts`** : Le fichier le plus important pour votre configuration.
     *   `convertToOpenAIHistory` : Traduit le format Google (rôles `user`/`model`) vers le format OpenAI (rôles `user`/`assistant`). Gère aussi la conversion des images en `image_url`.
@@ -30,27 +30,27 @@ C'est la couche d'abstraction réseau.
     *   `getConfiguredApiClient` : Nous l'avons modifié pour qu'il renvoie toujours votre URL Worker, bypassant les réglages utilisateur.
 *   **`logService.ts`** : Centralise tous les logs de l'application (erreurs, infos, debug) dans la console et dans l'onglet "Logs" de l'interface.
 
-### 📂 `all-model-chat/hooks/`
+### 📂 `my-ai-front/hooks/`
 C'est ici que réside la "mémoire vive" et la logique réactive de l'app.
 *   **`chat/useChatState.ts`** : Définit l'état global (messages, sessions actives, fichiers sélectionnés). Si vous voulez ajouter une nouvelle variable globale, c'est ici.
 *   **`chat/useChatHistory.ts`** : Gère la persistance dans `IndexedDB`. C'est ce qui fait que vos conversations sont sauvegardées quand vous rafraîchissez la page.
 *   **`ui/useSmoothStreaming.ts`** : Une pépite technique. Il lisse l'affichage du texte qui arrive de l'IA pour éviter les saccades visuelles et donner un effet d'écriture naturelle.
 *   **`core/useModels.ts`** : Désormais verrouillé. Il assure que l'application ne "voit" que votre modèle Gemini 2.5 Flash.
 
-### 📂 `all-model-chat/components/`
+### 📂 `my-ai-front/components/`
 La partie visuelle (React + Tailwind).
 *   **`message/MarkdownRenderer.tsx`** : Utilise `react-markdown`. Il contient les règles de transformation pour le code (syntax highlighting), les formules mathématiques (KaTeX) et les liens.
 *   **`message/content/MessageThoughts.tsx`** : Spécifique aux modèles de raisonnement. Il affiche le bloc escamotable "Pensées" quand le modèle utilise `reasoning_content`.
 *   **`layout/ChatArea.tsx`** : Le conteneur principal qui assemble la barre latérale, l'en-tête et la zone de chat.
 *   **`shared/ModelPicker.tsx`** : Bien que nous l'ayons désactivé visuellement, il reste dans le code. C'est le composant qui gérait les listes déroulantes de modèles.
 
-### 📂 `all-model-chat/utils/`
+### 📂 `my-ai-front/utils/`
 Les boîtes à outils.
 *   **`db.ts`** : Configuration de `Dexie.js` (IndexedDB). Définit les tables `sessions`, `messages` et `settings`.
 *   **`apiUtils.ts`** : Contient la logique de nettoyage des clés API. Nous l'avons forcé pour toujours renvoyer votre clé.
 *   **`uiUtils.ts`** : Petites fonctions pour gérer les classes CSS, les dates et le formatage des noms de fichiers.
 
-### 📂 `all-model-chat/styles/`
+### 📂 `my-ai-front/styles/`
 *   **`main.css`** : Contient les variables de thèmes (couleurs, arrondis, ombres).
 *   **`animations.css`** : Définit les effets de transition (fondu, glissement, clignotement du curseur).
 
