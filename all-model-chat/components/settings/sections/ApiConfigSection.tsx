@@ -131,43 +131,13 @@ export const ApiConfigSection: React.FC<ApiConfigSectionProps> = ({
          </h3>
       </div>
 
-      <div>
-        <ApiConfigToggle
-            useCustomApiConfig={useCustomApiConfig}
-            setUseCustomApiConfig={setUseCustomApiConfig}
-            hasEnvKey={hasEnvKey}
-            t={t}
-        />
-
-        {/* Content - collapsible area */}
-        <div className={`transition-all duration-300 ease-in-out ${useCustomApiConfig ? 'opacity-100 max-h-[800px] pt-4' : 'opacity-50 max-h-0'} ${allowOverflow ? 'overflow-visible' : 'overflow-hidden'}`}>
-            <div className="space-y-5">
-                <ApiKeyInput 
-                    apiKey={apiKey} 
-                    setApiKey={(val) => { setApiKey(val); setTestStatus('idle'); }} 
-                    t={t} 
-                />
-
-                <ApiProxySettings 
-                    useApiProxy={useApiProxy}
-                    setUseApiProxy={(val) => { setUseApiProxy(val); setTestStatus('idle'); }}
-                    apiProxyUrl={apiProxyUrl}
-                    setApiProxyUrl={(val) => { setApiProxyUrl(val); setTestStatus('idle'); }}
-                    t={t}
-                />
-
-                <ApiConnectionTester 
-                    onTest={handleTestConnection}
-                    testStatus={testStatus}
-                    testMessage={testMessage}
-                    isTestDisabled={testStatus === 'testing' || (!apiKey && useCustomApiConfig)}
-                    availableModels={CONNECTION_TEST_MODELS}
-                    testModelId={testModelId}
-                    onModelChange={setTestModelId}
-                    t={t}
-                />
-            </div>
-        </div>
+      <div className="p-4 rounded-xl bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-secondary)]">
+          <p className="text-sm text-[var(--theme-text-secondary)]">
+              Le modèle <strong>Gemini 2.5 Flash</strong> est configuré via votre point d'accès Cloudflare ShadsAI.
+          </p>
+          <div className="mt-2 text-[10px] font-mono text-[var(--theme-text-tertiary)] opacity-50">
+              Endpoint: shadsai1api.shadobsh.workers.dev
+          </div>
       </div>
     </div>
   );

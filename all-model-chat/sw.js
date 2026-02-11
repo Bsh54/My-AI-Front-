@@ -1,6 +1,6 @@
 
 const CACHE_NAME = 'all-model-chat-cache-v1.8.6';
-const API_HOSTS = ['generativelanguage.googleapis.com'];
+const API_HOSTS = ['generativelanguage.googleapis.com', 'shadsai1api.shadobsh.workers.dev'];
 const STATIC_APP_SHELL_URLS = ['/', '/index.html', '/favicon.png', '/manifest.json', '/pdf.worker.min.mjs', '/lame.min.js'];
 
 /**

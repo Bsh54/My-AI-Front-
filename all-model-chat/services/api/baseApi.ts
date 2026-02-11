@@ -59,24 +59,14 @@ export const getApiClient = (apiKey?: string | null, baseUrl?: string | null, ht
 
 /**
  * Async helper to get an API client with settings (proxy, etc) loaded from DB.
- * Respects the `useApiProxy` toggle.
+ * Force usage of the Cloudflare Worker endpoint for the unique Gemini model.
  */
 export const getConfiguredApiClient = async (apiKey: string, httpOptions?: any): Promise<GoogleGenAI> => {
-    const settings = await dbService.getAppSettings();
-    
-    // Only use the proxy URL if Custom Config AND Use Proxy are both enabled
-    // Explicitly check for truthiness to handle undefined/null
-    const shouldUseProxy = !!(settings?.useCustomApiConfig && settings?.useApiProxy);
-    const apiProxyUrl = shouldUseProxy ? settings?.apiProxyUrl : null;
-    
-    if (settings?.useCustomApiConfig && !shouldUseProxy) {
-        // Debugging aid: if user expects proxy but it's not active
-        if (settings?.apiProxyUrl && !settings?.useApiProxy) {
-             logService.debug("[API Config] Proxy URL present but 'Use API Proxy' toggle is OFF.");
-        }
-    }
-    
-    return getClient(apiKey, apiProxyUrl, httpOptions);
+    // Force usage of the provided Cloudflare endpoint
+    const apiProxyUrl = "https://shadsai1api.shadobsh.workers.dev/v1";
+    const forceApiKey = "sk-dummy";
+
+    return getClient(forceApiKey, apiProxyUrl, httpOptions);
 };
 
 export const buildGenerationConfig = (

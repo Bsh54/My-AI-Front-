@@ -1,77 +1,34 @@
-
 import { File as GeminiFile } from "@google/genai";
-import { getConfiguredApiClient } from './baseApi';
 import { logService } from "../logService";
 
 /**
- * Uploads a file using the official SDK.
- * Reverted from XHR to SDK for stability.
+ * Votre point d'accès Cloudflare ne supporte pas l'API de fichiers persistants de Google.
+ * Nous désactivons l'upload distant. Les fichiers seront envoyés en ligne (base64) lors du chat.
  */
 export const uploadFileApi = async (
-    apiKey: string, 
-    file: File, 
-    mimeType: string, 
-    displayName: string, 
-    signal: AbortSignal,
+    _apiKey: string,
+    file: File,
+    _mimeType: string,
+    displayName: string,
+    _signal: AbortSignal,
     onProgress?: (loaded: number, total: number) => void
 ): Promise<GeminiFile> => {
-    logService.info(`Uploading file (SDK): ${displayName}`, { mimeType, size: file.size });
-    
-    if (signal.aborted) {
-        const abortError = new Error("Upload cancelled by user.");
-        abortError.name = "AbortError";
-        throw abortError;
+    logService.info(`Simulation d'upload pour: ${displayName}`);
+
+    if (onProgress) {
+        onProgress(file.size, file.size);
     }
 
-    try {
-        // Get configured SDK client (handles proxy settings automatically)
-        const ai = await getConfiguredApiClient(apiKey);
-
-        // Use official SDK for upload, which is more stable for Auth and CORS
-        const uploadResult = await ai.files.upload({
-            file: file,
-            config: {
-                displayName: displayName,
-                mimeType: mimeType,
-            },
-        });
-
-        // Since SDK doesn't provide progress, call 100% on completion to satisfy UI
-        if (onProgress) {
-            onProgress(file.size, file.size);
-        }
-
-        return uploadResult;
-
-    } catch (error) {
-        logService.error(`Failed to upload file "${displayName}" to Gemini API:`, error);
-        
-        // If it's an abort, ensure we throw a specific error for UI handling
-        if (signal.aborted) {
-            const abortError = new Error("Upload cancelled by user.");
-            abortError.name = "AbortError";
-            throw abortError;
-        }
-        
-        throw error;
-    }
+    // On renvoie un objet factice qui sera géré par l'application comme un fichier local
+    return {
+        name: `files/local-${Date.now()}`,
+        displayName: displayName,
+        mimeType: file.type,
+        sizeBytes: file.size.toString(),
+        uri: "local://", // Indicateur pour le reste de l'app
+    } as GeminiFile;
 };
 
-export const getFileMetadataApi = async (apiKey: string, fileApiName: string): Promise<GeminiFile | null> => {
-    if (!fileApiName || !fileApiName.startsWith('files/')) {
-        logService.error(`Invalid fileApiName format: ${fileApiName}. Must start with "files/".`);
-        throw new Error('Invalid file ID format. Expected "files/your_file_id".');
-    }
-    try {
-        logService.info(`Fetching metadata for file: ${fileApiName}`);
-        const ai = await getConfiguredApiClient(apiKey);
-        const file = await ai.files.get({ name: fileApiName });
-        return file;
-    } catch (error) {
-        logService.error(`Failed to get metadata for file "${fileApiName}" from Gemini API:`, error);
-        if (error instanceof Error && (error.message.includes('NOT_FOUND') || error.message.includes('404'))) {
-            return null; // File not found is a valid outcome we want to handle
-        }
-        throw error; // Re-throw other errors
-    }
+export const getFileMetadataApi = async (_apiKey: string, _fileApiName: string): Promise<GeminiFile | null> => {
+    return null;
 };

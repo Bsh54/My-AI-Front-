@@ -14,10 +14,6 @@ interface VoiceControlProps {
 }
 
 export const VoiceControl: React.FC<VoiceControlProps> = ({
-  transcriptionModelId,
-  setTranscriptionModelId,
-  ttsVoice,
-  setTtsVoice,
   t
 }) => {
   return (
@@ -25,51 +21,11 @@ export const VoiceControl: React.FC<VoiceControlProps> = ({
         <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-tertiary)] flex items-center gap-2">
             <Mic size={14} strokeWidth={1.5} /> Audio & Speech
         </h4>
-        
-        <div className="space-y-3">
-            {/* Input Transcription Model */}
-            <Select
-                id="transcription-model-select"
-                label=""
-                layout="horizontal"
-                labelContent={
-                    <span className='flex items-center'>
-                        {t('chatBehavior_voiceModel_label')}
-                    <Tooltip text={t('chatBehavior_voiceModel_tooltip')}>
-                        <Info size={14} className="ml-2 text-[var(--theme-text-tertiary)] cursor-help" strokeWidth={1.5} />
-                    </Tooltip>
-                    </span>
-                }
-                value={transcriptionModelId}
-                onChange={(e) => setTranscriptionModelId(e.target.value)}
-            >
-                {AVAILABLE_TRANSCRIPTION_MODELS.map((model) => ( <option key={model.id} value={model.id}>{model.name}</option>))}
-            </Select>
 
-            {/* TTS Voice Selector */}
-            {ttsVoice && setTtsVoice && (
-                <Select
-                    id="tts-voice-select"
-                    label=""
-                    layout="horizontal"
-                    labelContent={
-                        <span className='flex items-center'>
-                            {t('settingsTtsVoice')}
-                        </span>
-                    }
-                    value={ttsVoice}
-                    onChange={(e) => setTtsVoice(e.target.value)}
-                >
-                    {AVAILABLE_TTS_VOICES.map((voice) => (
-                        <option key={voice.id} value={voice.id}>
-                            <div className="flex items-center gap-2">
-                                <AudioLines size={14} className="text-purple-500 flex-shrink-0" />
-                                <span>{voice.name} ({t(voice.styleKey)})</span>
-                            </div>
-                        </option>
-                    ))}
-                </Select>
-            )}
+        <div className="p-3 rounded-xl bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-secondary)]">
+            <p className="text-xs text-[var(--theme-text-secondary)]">
+                Les fonctions vocales avancées (TTS/Transcription native) ne sont pas disponibles avec la configuration actuelle du modèle unique.
+            </p>
         </div>
     </div>
   );

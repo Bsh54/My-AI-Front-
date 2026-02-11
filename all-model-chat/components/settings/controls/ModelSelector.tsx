@@ -13,33 +13,18 @@ interface ModelSelectorProps {
 }
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
-  availableModels,
   selectedModelId,
-  onSelectModel,
-  setAvailableModels
 }) => {
-  const [isEditingList, setIsEditingList] = useState(false);
-
   return (
-    <div className="space-y-4">
-        <ModelSelectorHeader 
-            isEditingList={isEditingList} 
-            setIsEditingList={setIsEditingList} 
-        />
-
-        {isEditingList ? (
-            <ModelListEditor 
-                availableModels={availableModels} 
-                onSave={setAvailableModels} 
-                setIsEditingList={setIsEditingList} 
-            />
-        ) : (
-            <ModelListView 
-                availableModels={availableModels} 
-                selectedModelId={selectedModelId} 
-                onSelectModel={onSelectModel} 
-            />
-        )}
+    <div className="p-3 rounded-xl bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-secondary)]">
+        <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-[var(--theme-text-primary)]">
+                Modèle Actif
+            </span>
+            <span className="text-xs px-2 py-1 rounded-md bg-[var(--theme-bg-primary)] text-[var(--theme-text-link)] font-mono">
+                {selectedModelId}
+            </span>
+        </div>
     </div>
   );
 };

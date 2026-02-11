@@ -6,22 +6,15 @@ import { sortModels, getDefaultModelOptions } from '../../utils/appUtils';
 const CUSTOM_MODELS_KEY = 'custom_model_list_v1';
 
 export const useModels = () => {
-    // Initialize with persisted models or defaults
+    // Force l'utilisation des modèles par défaut (Gemini 2.5 Flash uniquement)
+    // On ignore le localStorage pour garantir le verrouillage sur le modèle ShadsAI
     const [apiModels, setApiModelsState] = useState<ModelOption[]>(() => {
-        try {
-            const stored = localStorage.getItem(CUSTOM_MODELS_KEY);
-            if (stored) {
-                return JSON.parse(stored);
-            }
-        } catch (e) {
-            console.error('Failed to load custom models', e);
-        }
         return getDefaultModelOptions();
     });
-    
+
     const setApiModels = useCallback((models: ModelOption[]) => {
-        setApiModelsState(models);
-        localStorage.setItem(CUSTOM_MODELS_KEY, JSON.stringify(models));
+        // Désactivé : on ne permet plus de modifier la liste des modèles
+        logService.debug("setApiModels ignoré en mode modèle unique.");
     }, []);
 
     // Currently loading is instantaneous for local storage, but structure prepared for API fetch

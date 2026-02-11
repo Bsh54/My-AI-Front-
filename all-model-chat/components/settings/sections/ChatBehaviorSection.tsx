@@ -102,18 +102,15 @@ export const ChatBehaviorSection: React.FC<ChatBehaviorSectionProps> = (props) =
                       onChange={(e) => props.setAutoCanvasModelId(e.target.value)}
                       className="py-3"
                   >
-                      <option value="gemini-3-flash-preview">Gemini 3 Flash</option>
-                      <option value="gemini-3-pro-preview">Gemini 3 Pro</option>
+                      <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
                   </Select>
             </div>
         </div>
         
         <div className="pt-6 border-t border-[var(--theme-border-secondary)]">
-            <SafetySection 
-                safetySettings={props.safetySettings}
-                setSafetySettings={props.setSafetySettings}
-                t={t}
-            />
+            <p className="text-xs text-[var(--theme-text-tertiary)] italic">
+                Les paramètres de sécurité et de filtrage sont gérés directement par le point d'accès ShadsAI.
+            </p>
         </div>
     </div>
   );

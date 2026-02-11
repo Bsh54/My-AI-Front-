@@ -1,65 +1,44 @@
-
-import { GenerateContentResponse, Part, UsageMetadata, ChatHistoryItem } from "@google/genai";
-import { ThoughtSupportingPart } from '../../types';
+import { Part, UsageMetadata, ChatHistoryItem } from "@google/genai";
 import { logService } from "../logService";
-import { getConfiguredApiClient } from "./baseApi";
 
 /**
- * Shared helper to parse GenAI responses.
- * Extracts parts, separates thoughts, and merges metadata/citations from tool calls.
+ * Convertit l'historique Gemini au format OpenAI (avec support multimodal)
  */
-const processResponse = (response: GenerateContentResponse) => {
-    let thoughtsText = "";
-    const responseParts: Part[] = [];
-
-    if (response.candidates && response.candidates[0]?.content?.parts) {
-        for (const part of response.candidates[0].content.parts) {
-            const pAsThoughtSupporting = part as ThoughtSupportingPart;
-            if (pAsThoughtSupporting.thought) {
-                thoughtsText += part.text;
-            } else {
-                responseParts.push(part);
-            }
+const convertToOpenAIHistory = (history: ChatHistoryItem[], currentParts: Part[]) => {
+    const mapParts = (parts: Part[]) => {
+        if (parts.length === 1 && parts[0].text) {
+            return parts[0].text;
         }
-    }
 
-    if (responseParts.length === 0 && response.text) {
-        responseParts.push({ text: response.text });
-    }
-    
-    const candidate = response.candidates?.[0];
-    const groundingMetadata = candidate?.groundingMetadata;
-    const finalMetadata: any = groundingMetadata ? { ...groundingMetadata } : {};
-    
-    // @ts-ignore - Handle potential snake_case from raw API responses
-    const urlContextMetadata = candidate?.urlContextMetadata || candidate?.url_context_metadata;
-
-    const toolCalls = candidate?.toolCalls;
-    if (toolCalls) {
-        for (const toolCall of toolCalls) {
-            if (toolCall.functionCall?.args?.urlContextMetadata) {
-                if (!finalMetadata.citations) finalMetadata.citations = [];
-                const newCitations = toolCall.functionCall.args.urlContextMetadata.citations || [];
-                for (const newCitation of newCitations) {
-                    if (!finalMetadata.citations.some((c: any) => c.uri === newCitation.uri)) {
-                        finalMetadata.citations.push(newCitation);
+        return parts.map(p => {
+            if (p.text) return { type: "text", text: p.text };
+            if (p.inlineData) {
+                return {
+                    type: "image_url",
+                    image_url: {
+                        url: `data:${p.inlineData.mimeType};base64,${p.inlineData.data}`
                     }
-                }
+                };
             }
-        }
-    }
-
-    return {
-        parts: responseParts,
-        thoughts: thoughtsText || undefined,
-        usage: response.usageMetadata,
-        grounding: Object.keys(finalMetadata).length > 0 ? finalMetadata : undefined,
-        urlContext: urlContextMetadata
+            return null;
+        }).filter(Boolean);
     };
+
+    const messages = history.map(item => ({
+        role: item.role === 'model' ? 'assistant' : 'user',
+        content: mapParts(item.parts)
+    }));
+
+    messages.push({
+        role: 'user',
+        content: mapParts(currentParts)
+    });
+
+    return messages;
 };
 
 export const sendStatelessMessageStreamApi = async (
-    apiKey: string,
+    _apiKey: string,
     modelId: string,
     history: ChatHistoryItem[],
     parts: Part[],
@@ -67,91 +46,79 @@ export const sendStatelessMessageStreamApi = async (
     abortSignal: AbortSignal,
     onPart: (part: Part) => void,
     onThoughtChunk: (chunk: string) => void,
-    onError: (error: Error) => void,
+    _onError: (error: Error) => void,
     onComplete: (usageMetadata?: UsageMetadata, groundingMetadata?: any, urlContextMetadata?: any) => void,
-    role: 'user' | 'model' = 'user'
+    _role: 'user' | 'model' = 'user'
 ): Promise<void> => {
-    logService.info(`Sending message via stateless generateContentStream for ${modelId} (Role: ${role})`);
-    let finalUsageMetadata: UsageMetadata | undefined = undefined;
-    let finalGroundingMetadata: any = null;
-    let finalUrlContextMetadata: any = null;
+    const API_URL = "https://shadsai1api.shadobsh.workers.dev/v1/chat/completions";
+    const API_KEY = "sk-dummy";
+
+    logService.info(`Sending message via OpenAI format to Cloudflare for ${modelId}`);
 
     try {
-        const ai = await getConfiguredApiClient(apiKey);
-        
-        if (abortSignal.aborted) {
-            logService.warn("Streaming aborted by signal before start.");
-            return;
-        }
-
-        const result = await ai.models.generateContentStream({
-            model: modelId,
-            contents: [...history, { role: role, parts }],
-            config: config
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: modelId,
+                messages: convertToOpenAIHistory(history, parts),
+                stream: true,
+                temperature: config.temperature || 0.7,
+                top_p: config.topP || 0.95,
+            }),
+            signal: abortSignal
         });
 
-        for await (const chunkResponse of result) {
-            if (abortSignal.aborted) {
-                logService.warn("Streaming aborted by signal.");
-                break;
-            }
-            if (chunkResponse.usageMetadata) {
-                finalUsageMetadata = chunkResponse.usageMetadata;
-            }
-            const candidate = chunkResponse.candidates?.[0];
-            
-            if (candidate) {
-                const metadataFromChunk = candidate.groundingMetadata;
-                if (metadataFromChunk) {
-                    finalGroundingMetadata = metadataFromChunk;
-                }
-                
-                // @ts-ignore
-                const urlMetadata = candidate.urlContextMetadata || candidate.url_context_metadata;
-                if (urlMetadata) {
-                    finalUrlContextMetadata = urlMetadata;
-                }
+        if (!response.ok) {
+            throw new Error(`API Error: ${response.statusText}`);
+        }
 
-                const toolCalls = candidate.toolCalls;
-                if (toolCalls) {
-                    for (const toolCall of toolCalls) {
-                        if (toolCall.functionCall?.args?.urlContextMetadata) {
-                            if (!finalGroundingMetadata) finalGroundingMetadata = {};
-                            if (!finalGroundingMetadata.citations) finalGroundingMetadata.citations = [];
-                            const newCitations = toolCall.functionCall.args.urlContextMetadata.citations || [];
-                            for (const newCitation of newCitations) {
-                                if (!finalGroundingMetadata.citations.some((c: any) => c.uri === newCitation.uri)) {
-                                    finalGroundingMetadata.citations.push(newCitation);
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                if (candidate.content?.parts?.length) {
-                    for (const part of candidate.content.parts) {
-                        const pAsThoughtSupporting = part as ThoughtSupportingPart;
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
 
-                        if (pAsThoughtSupporting.thought) {
-                            onThoughtChunk(part.text || '');
-                        } else {
-                            onPart(part);
-                        }
+        if (!reader) throw new Error("No reader available");
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                const cleanLine = line.replace(/^data: /, '').trim();
+                if (!cleanLine || cleanLine === '[DONE]') continue;
+
+                try {
+                    const json = JSON.parse(cleanLine);
+                    const content = json.choices?.[0]?.delta?.content;
+                    const reasoning = json.choices?.[0]?.delta?.reasoning_content;
+
+                    if (reasoning) {
+                        onThoughtChunk(reasoning);
                     }
+                    if (content) {
+                        onPart({ text: content });
+                    }
+                } catch (e) {
+                    // Ignorer les erreurs de parsing sur les fragments
                 }
             }
         }
     } catch (error) {
-        logService.error("Error sending message (stream):", error);
-        onError(error instanceof Error ? error : new Error(String(error) || "Unknown error during streaming."));
+        logService.error("Error in OpenAI stream:", error);
     } finally {
-        logService.info("Streaming complete.", { usage: finalUsageMetadata, hasGrounding: !!finalGroundingMetadata });
-        onComplete(finalUsageMetadata, finalGroundingMetadata, finalUrlContextMetadata);
+        onComplete();
     }
 };
 
 export const sendStatelessMessageNonStreamApi = async (
-    apiKey: string,
+    _apiKey: string,
     modelId: string,
     history: ChatHistoryItem[],
     parts: Part[],
@@ -160,27 +127,32 @@ export const sendStatelessMessageNonStreamApi = async (
     onError: (error: Error) => void,
     onComplete: (parts: Part[], thoughtsText?: string, usageMetadata?: UsageMetadata, groundingMetadata?: any, urlContextMetadata?: any) => void
 ): Promise<void> => {
-    logService.info(`Sending message via stateless generateContent (non-stream) for model ${modelId}`);
-    
+    const API_URL = "https://shadsai1api.shadobsh.workers.dev/v1/chat/completions";
+    const API_KEY = "sk-dummy";
+
     try {
-        const ai = await getConfiguredApiClient(apiKey);
-
-        if (abortSignal.aborted) { onComplete([], "", undefined, undefined, undefined); return; }
-
-        const response = await ai.models.generateContent({
-            model: modelId,
-            contents: [...history, { role: 'user', parts }],
-            config: config
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEY}`
+            },
+            body: JSON.stringify({
+                model: modelId,
+                messages: convertToOpenAIHistory(history, parts),
+                stream: false,
+                temperature: config.temperature || 0.7,
+                top_p: config.topP || 0.95,
+            }),
+            signal: abortSignal
         });
 
-        if (abortSignal.aborted) { onComplete([], "", undefined, undefined, undefined); return; }
+        const json = await response.json();
+        const content = json.choices?.[0]?.message?.content || "";
+        const reasoning = json.choices?.[0]?.message?.reasoning_content || "";
 
-        const { parts: responseParts, thoughts, usage, grounding, urlContext } = processResponse(response);
-
-        logService.info(`Stateless non-stream complete for ${modelId}.`, { usage, hasGrounding: !!grounding, hasUrlContext: !!urlContext });
-        onComplete(responseParts, thoughts, usage, grounding, urlContext);
+        onComplete([{ text: content } as Part], reasoning);
     } catch (error) {
-        logService.error(`Error in stateless non-stream for ${modelId}:`, error);
-        onError(error instanceof Error ? error : new Error(String(error) || "Unknown error during stateless non-streaming call."));
+        onError(error as Error);
     }
 };
