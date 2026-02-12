@@ -117,16 +117,6 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
                     </button>
                 )}
 
-                {message.role === 'model' && !message.isLoading && (
-                    <button 
-                        onClick={() => onContinueGeneration(message.id)} 
-                        title="Continue Generating" 
-                        aria-label="Continue Generating" 
-                        className={actionButtonClasses}
-                    >
-                        <CirclePlay size={actionIconSize} strokeWidth={2} />
-                    </button>
-                )}
                 
                 {(message.content || message.thoughts) && !message.isLoading && (
                     <MessageCopyButton 
@@ -139,25 +129,6 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
                 
                 {message.content && !message.isLoading && message.role === 'model' && !message.audioSrc && (
                     <>
-                        {/* Canvas Generation Button */}
-                        <button
-                            onClick={() => onGenerateCanvas(message.id, message.content)}
-                            title={t('generate_canvas_title')}
-                            aria-label={t('generate_canvas_title')}
-                            className={actionButtonClasses}
-                        >
-                            <Wand2 size={actionIconSize} strokeWidth={2} />
-                        </button>
-
-                        <button 
-                            onClick={() => onTextToSpeech(message.id, message.content)} 
-                            disabled={!!ttsMessageId} 
-                            title="Read aloud" 
-                            aria-label="Read message aloud" 
-                            className={`${actionButtonClasses} disabled:opacity-30 disabled:cursor-not-allowed`}
-                        >
-                            {isThisMessageLoadingTts ? <Loader2 size={actionIconSize} className="animate-spin" strokeWidth={2} /> : <Volume2 size={actionIconSize} strokeWidth={2} />}
-                        </button>
                         <ExportMessageButton 
                             message={message}
                             sessionTitle={sessionTitle}
@@ -170,16 +141,6 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
                     </>
                 )}
                 
-                {!message.isLoading && (
-                    <button 
-                        onClick={() => onDeleteMessage(message.id)} 
-                        title={t('delete')} 
-                        aria-label={t('delete')} 
-                        className={`${actionButtonClasses} hover:text-[var(--theme-text-danger)] hover:bg-[var(--theme-bg-danger)]/10`}
-                    >
-                        <Trash2 size={actionIconSize} strokeWidth={2} />
-                    </button>
-                )}
             </div>
         </div>
     );
