@@ -22,11 +22,14 @@ export const AppearanceSection: React.FC<AppearanceSectionProps> = ({ settings, 
         t={t}
       />
 
+      {/* Font Size Control - Hidden Visually */}
+      {/*
       <FontSizeControl
         settings={settings}
         onUpdate={onUpdate}
         t={t}
       />
+      */}
 
       <FileStrategyControl
         settings={settings}
