@@ -14,6 +14,30 @@ export const useMessageListScroll = ({ messages, setScrollContainerRef, activeSe
     const [atBottom, setAtBottom] = useState(true);
     const [scrollerRef, setInternalScrollerRef] = useState<HTMLElement | null>(null);
     const visibleRangeRef = useRef({ startIndex: 0, endIndex: 0 });
+
+    // --- Auto-scroll Logic for Progressive Streaming ---
+    const lastMessage = messages[messages.length - 1];
+    const isStreaming = lastMessage?.role === 'model' && lastMessage?.isLoading;
+    const lastContentLength = useRef(0);
+
+    useEffect(() => {
+        if (isStreaming && atBottom) {
+            const currentLength = lastMessage?.content?.length || 0;
+            if (currentLength > lastContentLength.current) {
+                // We use requestAnimationFrame to sync with browser's paint cycle for smoothness
+                requestAnimationFrame(() => {
+                    virtuosoRef.current?.scrollToIndex({
+                        index: messages.length - 1,
+                        align: 'end',
+                        behavior: 'auto' // 'auto' is better for frequent small jumps than 'smooth'
+                    });
+                });
+            }
+            lastContentLength.current = currentLength;
+        } else if (!isStreaming) {
+            lastContentLength.current = 0;
+        }
+    }, [lastMessage?.content, isStreaming, atBottom, messages.length]);
     
     const scrollSaveTimeoutRef = useRef<number | null>(null);
     const lastRestoredSessionIdRef = useRef<string | null>(null);
