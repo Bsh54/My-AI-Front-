@@ -103,7 +103,8 @@ export const ModelVoiceSettings: React.FC<ModelVoiceSettingsProps> = (props) => 
             t={t}
           />
 
-          {/* Thinking Controls */}
+          {/* Thinking Controls - Hidden Visually */}
+          {/*
           <ThinkingControl
             modelId={modelId}
             thinkingBudget={thinkingBudget}
@@ -114,6 +115,7 @@ export const ModelVoiceSettings: React.FC<ModelVoiceSettingsProps> = (props) => 
             setShowThoughts={setShowThoughts}
             t={t}
           />
+          */}
 
           <div className="pt-2">
                 <div className="flex justify-between items-center mb-2">
@@ -168,6 +170,8 @@ export const ModelVoiceSettings: React.FC<ModelVoiceSettingsProps> = (props) => 
                     className="w-full h-1.5 bg-[var(--theme-border-secondary)] rounded-lg appearance-none cursor-pointer accent-[var(--theme-bg-accent)] hover:accent-[var(--theme-bg-accent-hover)]" />
                 </div>
 
+                {/* Top P and Media Resolution - Hidden Visually */}
+                {/*
                 <div>
                     <div className="flex justify-between mb-2">
                         <label htmlFor="top-p-slider" className="text-sm font-medium text-[var(--theme-text-primary)] flex items-center">
@@ -206,15 +210,18 @@ export const ModelVoiceSettings: React.FC<ModelVoiceSettingsProps> = (props) => 
                         {!isNativeAudio && <option value={MediaResolution.MEDIA_RESOLUTION_ULTRA_HIGH}>{t('mediaResolution_ultra_high')}</option>}
                     </Select>
                 )}
+                */}
             </div>
       </div>
 
-      {/* Voice & Audio Group */}
+      {/* Voice & Audio Group - Hidden Visually */}
+      {/*
       <VoiceControl
         transcriptionModelId={transcriptionModelId}
         setTranscriptionModelId={setTranscriptionModelId}
         t={t}
       />
+      */}
     </div>
   );
 };

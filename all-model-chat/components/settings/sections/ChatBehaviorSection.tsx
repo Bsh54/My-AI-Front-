@@ -75,20 +75,21 @@ export const ChatBehaviorSection: React.FC<ChatBehaviorSectionProps> = (props) =
             setMediaResolution={props.setMediaResolution}
         />
 
-        {/* Canvas Visualization Settings */}
+        {/* Canvas Visualization Settings - Hidden Visually */}
+        {/*
         <div className="pt-6 border-t border-[var(--theme-border-secondary)] space-y-4">
              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--theme-text-tertiary)] flex items-center gap-2">
                 <Wand2 size={14} strokeWidth={1.5} />
                 Canvas Visualization
             </h4>
             <div className="space-y-1">
-                 <ToggleItem 
-                    label={t('settings_autoCanvasVisualization_label')} 
-                    checked={props.autoCanvasVisualization} 
-                    onChange={props.setAutoCanvasVisualization} 
-                    tooltip={t('settings_autoCanvasVisualization_tooltip')} 
+                 <ToggleItem
+                    label={t('settings_autoCanvasVisualization_label')}
+                    checked={props.autoCanvasVisualization}
+                    onChange={props.setAutoCanvasVisualization}
+                    tooltip={t('settings_autoCanvasVisualization_tooltip')}
                  />
-                 
+
                  <Select
                       id="canvas-model-select"
                       label=""
@@ -106,6 +107,7 @@ export const ChatBehaviorSection: React.FC<ChatBehaviorSectionProps> = (props) =
                   </Select>
             </div>
         </div>
+        */}
         
         <div className="pt-6 border-t border-[var(--theme-border-secondary)]">
             <p className="text-xs text-[var(--theme-text-tertiary)] italic">

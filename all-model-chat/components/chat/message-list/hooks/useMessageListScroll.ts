@@ -61,48 +61,39 @@ export const useMessageListScroll = ({ messages, setScrollContainerRef, activeSe
         visibleRangeRef.current = { startIndex, endIndex };
     }, []);
 
-    // Handle New Turn Anchoring: When a message is sent, scroll the model's message to the top.
+    // Handle New Turn: When a message is sent, ensure we stay at the bottom
     useEffect(() => {
         const sessionChanged = prevSessionIdForAnchor.current !== activeSessionId;
-        const restorationPending = lastRestoredSessionIdRef.current !== activeSessionId;
 
-        // GUARD: If session changed OR we are waiting for scroll restoration to complete,
-        // we must NOT auto-scroll to bottom. This prevents the "jump to bottom" glitch
-        // when loading a history session that has many messages.
-        if (sessionChanged || restorationPending) {
-            // Update trackers to current state so we don't trigger "new message" logic on the next render
+        if (sessionChanged) {
             prevSessionIdForAnchor.current = activeSessionId;
             prevMsgCount.current = messages.length;
+
+            // Initial jump to bottom when switching sessions
+            if (messages.length > 0) {
+                setTimeout(() => {
+                    virtuosoRef.current?.scrollToIndex({
+                        index: messages.length - 1,
+                        align: 'end',
+                        behavior: 'auto'
+                    });
+                    setAtBottom(true);
+                }, 100);
+            }
             return;
         }
 
-        // Normal Logic: If message count increased within the SAME, STABLE session
-        if (messages.length > prevMsgCount.current) {
-            // Find the index of the newly added Model message (placeholder)
-            let targetIndex = -1;
-            // Search backwards starting from the end of the previous message count
-            for (let i = messages.length - 1; i >= Math.max(0, prevMsgCount.current - 1); i--) {
-                if (messages[i].role === 'model') {
-                    targetIndex = i;
-                    break;
-                }
-            }
-
-            if (targetIndex !== -1) {
-                // Anchor view to the top of the model message (start of response)
-                // Timeout ensures render cycle is complete including footer height adjustment
-                setTimeout(() => {
-                    virtuosoRef.current?.scrollToIndex({
-                        index: targetIndex,
-                        align: 'start',
-                        behavior: 'smooth'
-                    });
-                    lastScrollTarget.current = targetIndex;
-                }, 50);
-            }
+        // If new messages arrive and we were already at bottom, stay at bottom
+        if (messages.length > prevMsgCount.current && atBottom) {
+            virtuosoRef.current?.scrollToIndex({
+                index: messages.length - 1,
+                align: 'end',
+                behavior: 'smooth'
+            });
         }
+
         prevMsgCount.current = messages.length;
-    }, [messages, activeSessionId]);
+    }, [messages, activeSessionId, atBottom]);
 
     // Enhanced Navigation Logic: Search data array instead of DOM
     const scrollToPrevTurn = useCallback(() => {
