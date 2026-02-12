@@ -15,41 +15,15 @@ export const useMessageListScroll = ({ messages, setScrollContainerRef, activeSe
     const [scrollerRef, setInternalScrollerRef] = useState<HTMLElement | null>(null);
     const visibleRangeRef = useRef({ startIndex: 0, endIndex: 0 });
 
-    // --- Auto-scroll Logic for Progressive Streaming ---
+    const lastRestoredSessionIdRef = useRef<string | null>(null);
+    const lastScrollTarget = useRef<number | null>(null);
+    const prevMsgCount = useRef(messages.length);
+
     const lastMessage = messages[messages.length - 1];
     const isStreaming = lastMessage?.role === 'model' && lastMessage?.isLoading;
     const lastContentLength = useRef(0);
 
-    useEffect(() => {
-        if (isStreaming && atBottom) {
-            const currentLength = lastMessage?.content?.length || 0;
-            if (currentLength > lastContentLength.current) {
-                // We use requestAnimationFrame to sync with browser's paint cycle for smoothness
-                requestAnimationFrame(() => {
-                    virtuosoRef.current?.scrollToIndex({
-                        index: messages.length - 1,
-                        align: 'end',
-                        behavior: 'auto' // 'auto' is better for frequent small jumps than 'smooth'
-                    });
-                });
-            }
-            lastContentLength.current = currentLength;
-        } else if (!isStreaming) {
-            lastContentLength.current = 0;
-        }
-    }, [lastMessage?.content, isStreaming, atBottom, messages.length]);
-    
-    const scrollSaveTimeoutRef = useRef<number | null>(null);
-    const lastRestoredSessionIdRef = useRef<string | null>(null);
-    
-    // Track the last index we programmatically scrolled to
-    const lastScrollTarget = useRef<number | null>(null);
-
-    // Track state for the anchoring effect specifically
-    const prevMsgCount = useRef(messages.length);
-    const prevSessionIdForAnchor = useRef(activeSessionId);
-
-    // Sync internal scroller ref with parent's expectations
+    // Sync internal scroller ref with parent
     useEffect(() => {
         if (scrollerRef) {
             setScrollContainerRef(scrollerRef as HTMLDivElement);
@@ -61,11 +35,30 @@ export const useMessageListScroll = ({ messages, setScrollContainerRef, activeSe
         visibleRangeRef.current = { startIndex, endIndex };
     }, []);
 
-    // --- Logique de défilement collant ---
+    // --- Progressive Auto-scroll Logic ---
+    useEffect(() => {
+        if (isStreaming && atBottom) {
+            const currentLength = lastMessage?.content?.length || 0;
+            if (currentLength > lastContentLength.current) {
+                requestAnimationFrame(() => {
+                    virtuosoRef.current?.scrollToIndex({
+                        index: messages.length - 1,
+                        align: 'end',
+                        behavior: 'auto'
+                    });
+                });
+            }
+            lastContentLength.current = currentLength;
+        } else if (!isStreaming) {
+            lastContentLength.current = 0;
+        }
+    }, [lastMessage?.content, isStreaming, atBottom, messages.length]);
+
+    // --- Sticky Scroll Logic (Session change & New messages) ---
     useEffect(() => {
         if (!activeSessionId || messages.length === 0) return;
 
-        // Cas 1 : On change de chat -> Saut immédiat en bas
+        // On session change -> Instant jump to bottom
         if (lastRestoredSessionIdRef.current !== activeSessionId) {
             lastRestoredSessionIdRef.current = activeSessionId;
             prevMsgCount.current = messages.length;
@@ -81,32 +74,68 @@ export const useMessageListScroll = ({ messages, setScrollContainerRef, activeSe
             return;
         }
 
-        // Cas 2 : Nouveaux messages ou texte qui s'écrit -> On suit si on est déjà en bas
-        if (messages.length > prevMsgCount.current || isStreaming) {
+        // On new messages -> Smooth scroll if already at bottom
+        if (messages.length > prevMsgCount.current) {
             if (atBottom) {
                 virtuosoRef.current?.scrollToIndex({
                     index: messages.length - 1,
                     align: 'end',
-                    behavior: isStreaming ? 'auto' : 'smooth'
+                    behavior: 'smooth'
                 });
             }
             prevMsgCount.current = messages.length;
         }
-    }, [activeSessionId, messages, atBottom, isStreaming]);
+    }, [activeSessionId, messages, atBottom]);
+
+    // --- Navigation Logic ---
+    const scrollToPrevTurn = useCallback(() => {
+        const currentStartIndex = visibleRangeRef.current.startIndex;
+        let targetIndex = -1;
+        for (let i = Math.max(0, currentStartIndex - 1); i >= 0; i--) {
+             if (messages[i].role === 'user') {
+                 targetIndex = i;
+                 break;
+             }
+        }
+        if (targetIndex !== -1) {
+             lastScrollTarget.current = targetIndex;
+             virtuosoRef.current?.scrollToIndex({ index: targetIndex, align: 'start', behavior: 'smooth' });
+        } else {
+             virtuosoRef.current?.scrollToIndex({ index: 0, align: 'start', behavior: 'smooth' });
+        }
+    }, [messages]);
+
+    const scrollToNextTurn = useCallback(() => {
+        const currentStartIndex = visibleRangeRef.current.startIndex;
+        let targetIndex = -1;
+        let startSearchIndex = currentStartIndex + 1;
+        if (lastScrollTarget.current !== null && Math.abs(currentStartIndex - lastScrollTarget.current) <= 1) {
+             startSearchIndex = Math.max(startSearchIndex, lastScrollTarget.current + 1);
+        }
+        for (let i = startSearchIndex; i < messages.length; i++) {
+             if (messages[i].role === 'user') {
+                 targetIndex = i;
+                 break;
+             }
+        }
+        if (targetIndex !== -1) {
+             lastScrollTarget.current = targetIndex;
+             virtuosoRef.current?.scrollToIndex({ index: targetIndex, align: 'start', behavior: 'smooth' });
+        } else {
+             lastScrollTarget.current = messages.length - 1;
+             virtuosoRef.current?.scrollToIndex({ index: messages.length - 1, align: 'end', behavior: 'smooth' });
+        }
+    }, [messages]);
 
     const handleScroll = useCallback(() => {
         if (document.hidden || !scrollerRef) return;
-
         const { scrollTop, scrollHeight, clientHeight } = scrollerRef;
-        // If we're within 150px of the bottom, consider it "at bottom"
         const isAtBottom = scrollHeight - scrollTop - clientHeight < 150;
-
         if (isAtBottom !== atBottom) {
             setAtBottom(isAtBottom);
         }
     }, [scrollerRef, atBottom]);
 
-    // Attach listener manually to the scroller ref
     useEffect(() => {
         const container = scrollerRef;
         if (container) {
