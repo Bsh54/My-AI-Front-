@@ -191,15 +191,15 @@ const ShadsAIHub: React.FC<ShadsAIHubProps> = (props) => {
                   </div>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-8 md:px-12 mt-10 space-y-4">
-                  <span className="bg-[var(--theme-bg-accent)] text-white px-5 py-1.5 rounded-full font-black text-[10px] uppercase tracking-widest inline-block shadow-lg">{selectedOpp.type}</span>
-                  <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-[var(--theme-text-primary)]">{selectedOpp.title}</h1>
+                <div className="max-w-7xl mx-auto px-6 md:px-12 mt-8 space-y-3">
+                  <span className="bg-[var(--theme-bg-accent)] text-white px-4 py-1 rounded-full font-black text-[9px] uppercase tracking-widest inline-block shadow-lg">{selectedOpp.type}</span>
+                  <h1 className="text-2xl md:text-6xl font-black tracking-tighter text-[var(--theme-text-primary)] leading-tight">{selectedOpp.title}</h1>
                 </div>
 
-                <div className="max-w-7xl mx-auto px-8 md:px-12 mt-12 grid grid-cols-1 lg:grid-cols-2 gap-16">
-                  <div className="space-y-10">
-                    <div className="prose prose-invert text-[var(--theme-text-secondary)] text-xl leading-relaxed max-w-none">
-                      <div className="space-y-8 text-lg font-medium opacity-90">
+                <div className="max-w-7xl mx-auto px-6 md:px-12 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-12">
+                  <div className="space-y-8">
+                    <div className="prose prose-invert text-[var(--theme-text-secondary)] text-base md:text-xl leading-relaxed max-w-none">
+                      <div className="space-y-6 text-sm md:text-lg font-medium opacity-90">
                         {selectedOpp.fullContent.split('\n').map((line, i) => <p key={i}>{line}</p>)}
                       </div>
                     </div>
