@@ -139,8 +139,8 @@ const ShadsAIHub: React.FC<ShadsAIHubProps> = (props) => {
   return (
     <div className={`flex flex-col h-full w-full overflow-hidden bg-[var(--theme-bg-primary)] text-[var(--theme-text-primary)] transition-colors duration-300`}>
 
-      {/* HEADER NAV */}
-      <header className="flex items-center justify-between px-6 py-3 border-b border-[var(--theme-border-primary)] bg-[var(--theme-bg-secondary)] z-[100] shadow-sm">
+      {/* HEADER NAV - DESKTOP ONLY */}
+      <header className="hidden md:flex items-center justify-between px-6 py-3 border-b border-[var(--theme-border-primary)] bg-[var(--theme-bg-secondary)] z-[100] shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-[var(--theme-bg-accent)] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--theme-bg-accent)]/20">
             <Sparkles className="w-5 h-5 text-[var(--theme-text-accent)]" />
@@ -173,13 +173,35 @@ const ShadsAIHub: React.FC<ShadsAIHubProps> = (props) => {
           </button>
         </nav>
 
-        <div className="hidden md:flex items-center gap-4">
-           <button className="p-2 text-[var(--theme-text-secondary)] hover:text-[var(--theme-bg-accent)] transition-colors">
-              <Bell className="w-5 h-5" />
-           </button>
-           <div className="w-10 h-10 rounded-full bg-[var(--theme-bg-tertiary)] border border-[var(--theme-border-secondary)]"></div>
-        </div>
+        <div className="w-32"></div>
       </header>
+
+      {/* MOBILE APP BAR - BOTTOM NAVIGATION */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-[var(--theme-bg-secondary)]/80 backdrop-blur-2xl border-t border-[var(--theme-border-primary)] z-[100] px-12 flex items-center justify-around pb-4">
+        <button
+          onClick={() => setActiveTab('opportunities')}
+          className={`flex flex-col items-center gap-1 transition-all active:scale-90 ${
+            activeTab === 'opportunities' ? 'text-[var(--theme-bg-accent)]' : 'text-[var(--theme-text-secondary)]'
+          }`}
+        >
+          <div className={`p-2 rounded-2xl transition-all ${activeTab === 'opportunities' ? 'bg-[var(--theme-bg-accent)]/10' : ''}`}>
+            <Lightbulb className="w-6 h-6" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-tighter">Explorer</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('chat')}
+          className={`flex flex-col items-center gap-1 transition-all active:scale-90 ${
+            activeTab === 'chat' ? 'text-[var(--theme-bg-accent)]' : 'text-[var(--theme-text-secondary)]'
+          }`}
+        >
+          <div className={`p-2 rounded-2xl transition-all ${activeTab === 'chat' ? 'bg-[var(--theme-bg-accent)]/10' : ''}`}>
+            <MessageSquare className="w-6 h-6" />
+          </div>
+          <span className="text-[10px] font-black uppercase tracking-tighter">Assistant</span>
+        </button>
+      </nav>
 
       <div className="flex-1 relative overflow-hidden">
 
