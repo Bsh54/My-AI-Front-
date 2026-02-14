@@ -132,6 +132,7 @@ const ShadsAIHub: React.FC<ShadsAIHubProps> = (props) => {
   const [activeTab, setActiveTab] = useState<'chat' | 'opportunities'>('opportunities');
   const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
   const [filterType, setFilterType] = useState<string>('Tous');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const otherOpps = OPPORTUNITIES_DATA.filter(o => filterType === 'Tous' || o.type === filterType);
 
